@@ -14,7 +14,7 @@ const SERVIDOR_PORTA = 3300;
 // true -> insere
 const HABILITAR_OPERACAO_INSERIR = true;
 
-// Função para comunicação serial
+// Função para comunicação serial   
 const serial = async (
     valoresLuminosidade,
     valoresLm35Temperatura,
@@ -26,11 +26,11 @@ const serial = async (
         {
             // altere!
             // Credenciais do banco de dados
-            host: 'localhost',
-            user: 'userInsert',
-            password: '1234',
+            host: '10.18.32.186',
+            user: 'aluno',
+            password: 'Aquaponix#123',
             database: 'projeto',
-            port: 3306
+            port: 3307
         }
     ).promise();
 
@@ -56,14 +56,14 @@ const serial = async (
 
     // Processa os dados recebidos do Arduino
     arduino.pipe(new serialport.ReadlineParser({ delimiter: '\r\n' })).on('data', async (data) => {
-        console.log(data);
         const valores = data.split(';');
         const lm35Temperatura = parseFloat(valores[0]);
         const luminosidade = parseFloat(valores[1]);
 
         // Armazena os valores dos sensores nos arrays correspondentes
-        valoresLuminosidade.push(luminosidade);
         valoresLm35Temperatura.push(lm35Temperatura);
+        valoresLuminosidade.push(luminosidade);
+        console.log(data);
 
         // Insere os dados no banco de dados (se habilitado)
         if (HABILITAR_OPERACAO_INSERIR) {
@@ -74,7 +74,7 @@ const serial = async (
                 'INSERT INTO dados (temperatura, luminosidade) VALUES (?, ?)',
                 [lm35Temperatura, luminosidade]
             );
-            console.log("valores inseridos no banco: ", + luminosidade + ", " + lm35Temperatura)
+            console.log("valores inseridos no banco: ", + lm35Temperatura + ", " + luminosidade)
 
         }
 
@@ -86,12 +86,11 @@ const serial = async (
     });
 }
 
-
 // não altere!
 // Função para criar e configurar o servidor web
 const servidor = (
-    valoresLuminosidade,
     valoresLm35Temperatura,
+    valoresLuminosidade,
 ) => {
     const app = express();
 
@@ -109,29 +108,29 @@ const servidor = (
 
     // Define os endpoints da API para cada tipo de sensor
 
-    app.get('/sensores/luminosidade', (_, response) => {
-        return response.json(valoresLuminosidade);
-    });
     app.get('/sensores/lm35/temperatura', (_, response) => {
         return response.json(valoresLm35Temperatura);
+    });
+    app.get('/sensores/luminosidade', (_, response) => {
+        return response.json(valoresLuminosidade);
     });
 }
 
 // Função principal assíncrona para iniciar a comunicação serial e o servidor web
 (async () => {
     // Arrays para armazenar os valores dos sensores
-    const valoresLuminosidade = [];
     const valoresLm35Temperatura = [];
+    const valoresLuminosidade = [];
 
     // Inicia a comunicação serial
     await serial(
-        valoresLuminosidade,
         valoresLm35Temperatura,
+        valoresLuminosidade,
     );
 
     // Inicia o servidor web
     servidor(
-        valoresLuminosidade,
         valoresLm35Temperatura,
+        valoresLuminosidade,
     );
 })();

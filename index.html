@@ -1,8 +1,7 @@
 <!doctype html>
 <html>
-
 <head>
-    <title>Line Chart</title>
+    <title>Aquaponix Graficos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="http://www.chartjs.org/dist/2.7.1/Chart.js"></script>
     <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
@@ -13,65 +12,43 @@
             -ms-user-select: none;
             user-select: none;
         }
-    </style>
+
+        .graficos{
+            display: flex;
+            width: 100%;
+        }
+        
+        .grafico-luminosidade, .grafico-temperatura{
+            width: 50%;
+        }
+        
+        h1{
+            width:400px;
+        }
+        
+        </style>
 </head>
 
 <body>
-    <div>
-        <h1>Sensor Luminosidade</h1>
-        <section style="width: 100%;">
-            <canvas id="luminosidade"></canvas>
-        </section>
-        <h1>Sensor LM 35 - Temperatura</h1>
-        <section style="width: 100%;">
-            <canvas id="lm35Temperatura"></canvas>
-        </section>
+    <div class="graficos">
+        <div class="grafico-temperatura">
+            <h1>Sensor LM 35 - Temperatura</h1>
+            <section style="width: 100%;">
+                <canvas id="luminosidade"></canvas>
+            </section>
+        </div>
+        <div class="grafico-luminosidade">
+            <h1>Sensor LDR - Luminosidade</h1>
+            <section style="width: 100%;">
+                <canvas id="lm35Temperatura"></canvas>
+            </section>
+        </div>
     </div>
 
     <script>
-        /* -- luminosidade -- */
-        var contextoLuminosidade = document.getElementById('luminosidade').getContext('2d');
-        contextoLuminosidade.canvas.width = 1000;
-        contextoLuminosidade.canvas.height = 300;
-        var luminosidade = new Chart(
-            contextoLuminosidade,
-            {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        label: 'Luminosidade',
-                        type: 'line',
-                        borderColor: ['#ffd902'],
-                        backgroundColor: ['#ffe135']
-                    }]
-                },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            distribution: 'series',
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Luminosidade'
-                            },
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    },
-                    animation: {
-                        duration: 0
-                    }
-                }
-            }
-        );
         /* -- lm35Temperatura */
         var contextoLm35Temperatura = document.getElementById('lm35Temperatura').getContext('2d');
-        contextoLm35Temperatura.canvas.width = 1000;
+        contextoLm35Temperatura.canvas.width = 500;
         contextoLm35Temperatura.canvas.height = 300;
         var lm35Temperatura = new Chart(
             contextoLm35Temperatura,
@@ -82,7 +59,8 @@
                         label: 'Temperatura',
                         type: 'line',
                         borderColor: ['#ffd902'],
-                        backgroundColor: ['#ffe135']
+                        backgroundColor: ['#ffe135'],
+                        fill: false
                     }]
                 },
                 options: {
@@ -97,6 +75,48 @@
                             scaleLabel: {
                                 display: true,
                                 labelString: 'Temperatura'
+                            },
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    animation: {
+                        duration: 0
+                    }
+                }
+            }
+        );
+
+        /* -- luminosidade -- */
+        var contextoLuminosidade = document.getElementById('luminosidade').getContext('2d');
+        contextoLuminosidade.canvas.width = 500;
+        contextoLuminosidade.canvas.height = 300;
+        var luminosidade = new Chart(
+            contextoLuminosidade,
+            {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Luminosidade',
+                        type: 'line',
+                        borderColor: ['#11a175'],
+                        backgroundColor: ['#11a175'],
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            distribution: 'series',
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Luminosidade'
                             },
                             ticks: {
                                 beginAtZero: true
@@ -141,8 +161,8 @@
         }
 
         setInterval(() => {
-            obterDados(luminosidade, 'luminosidade');
             obterDados(lm35Temperatura, 'lm35/temperatura');
+            obterDados(luminosidade, 'luminosidade');
         }, 1000);
 
     </script>
