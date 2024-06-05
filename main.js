@@ -28,7 +28,7 @@ const serial = async (
             // Credenciais do banco de dados
             host: '10.18.32.186',
             user: 'aluno',
-            password: 'Aquaponix#123',
+            password: 'Sptech#2024',
             database: 'projeto',
             port: 3307
         }
@@ -68,14 +68,27 @@ const serial = async (
         // Insere os dados no banco de dados (se habilitado)
         if (HABILITAR_OPERACAO_INSERIR) {
 
-            // altere!
-            // Este insert irá inserir os dados na tabela "medida"
-            await poolBancoDados.execute(
-                'INSERT INTO dados (temperatura, luminosidade) VALUES (?, ?)',
-                [lm35Temperatura, luminosidade]
-            );
-            console.log("valores inseridos no banco: ", + lm35Temperatura + ", " + luminosidade)
+            const instrucaoSql = `
+                SELECT idDado FROM dadoscapturados WHERE fkSensor = 1 AND fkLocal = 1 AND fkEmpresa = 1 ORDER BY idDado DESC LIMIT 1;
+            `;
+            const lastIdTanque = await poolBancoDados.query(instrucaoSql).then(([data]) => { 
+                return data.length == 0 ? 1 : data[0].idDado + 1;
+            });
+            await poolBancoDados.execute(`
+                INSERT INTO dadoscapturados VALUES (${lastIdTanque}, ${lm35Temperatura}, default, 1, 1, 1);
+            `)
 
+            const instrucaoSql2 = `
+                SELECT idDado FROM dadoscapturados WHERE fkSensor = 2 AND fkLocal = 2 AND fkEmpresa = 1 ORDER BY idDado DESC LIMIT 1;
+            `;
+            const lastIdHorta = await poolBancoDados.query(instrucaoSql2).then(([data]) => { 
+                return data.length == 0 ? 1 : data[0].idDado + 1;
+            });
+            await poolBancoDados.execute(`
+                INSERT INTO dadoscapturados VALUES (${lastIdHorta}, ${luminosidade}, default, 2, 2, 1);
+            `)
+
+            console.log("valores inseridos no banco: ", + lm35Temperatura + ", " + luminosidade)
         }
 
     });
